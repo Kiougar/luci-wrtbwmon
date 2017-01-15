@@ -1,0 +1,12 @@
+install: true
+script: ./mkipk.sh
+deploy:
+  provider: releases
+  api_key:
+    secure: L5e6XlInj2M+fwL0qNQnwsykLtJtmEWNQrALgGcZcoqnBKsuc8rXrSujnlx1FnhR7ntYaSawQk4q7Ca8gk4a/a9BGxZrv2YUOhzLbiAnnaskystZ6J/x6mJqvUizLtB77b/62AFuJj6OkrESSgXrHCj0daHDDfotkV2BOqcEdUg65TgbtjDWEVgs+dyGuV76lGgh90BW/nyJButN3WFczPQKfLleuHJJ+Rg7OCjgMyruTBM0vYuwfAnNWeUCsVhAcOriRPoM+dkdiUB5wla6yj9gnUphuk2Gn773HXlZbcMQULh0tWIlGc3K05KJMBQdNnJaLPMnA2nmI5eogDSpB+oTJiBk8CMYFhG3y9xWHOHcbMszC8q3o8mUOaJQagrx0GD8EEuQum7lksKCYZImDQQLs0K8Ndrc2QOIjZza2Sx1Pscpbt4Jvhn548h/bIEsccgOJeduYZm9XJkjxpyL/XN94pRjz2JWnEPnRlep9yVX1Pl76eDvN86IP1CPL0We31FsAVD8mkFXtSqmPRfUepgqXbD+5QvnX6PqEzDOOuZmE/E4Dlktvgj14ix2jJMzIjdQDfhafCUzZ6Wmjmcbx+RnqfRb9FE34QsHecI4y+tGaAb2w81NqDI/35o2qZX84NxuW0UPIOF0PW+owabvHB1smCBiwFepLNy7RDwlzzc=
+  file_glob: true
+  file: luci-wrtbwmon*.ipk
+  skip_cleanup: true
+  on:
+    repo: Kiougar/luci-wrtbwmon
+    tags: true

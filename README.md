@@ -46,6 +46,7 @@ For the above commands to work the only *requirement* is that the `wrtbwmon` pac
 * Install the package `opkg install /tmp/wrtbwmon_*_all.ipk`
         
 ##### Step 2 - setup* the `wrtbwmon` package:
+
 * If you have `wrtbwmon` version `0.35` the init script uses `wrtbwmon.sh` where it was renamed to `wrtbwmon`
     * to fix: `sed -i 's/wrtbwmon\.sh/wrtbwmon/g' /etc/init.d/wrtbwmon`
 * Schedule it to run on startup `/etc/init.d/wrtbwmon enable`
@@ -54,13 +55,15 @@ For the above commands to work the only *requirement* is that the `wrtbwmon` pac
 **If you have already setup a `cron job` to update the `wrtbwmon` database, it would be best if you removed it*
 
 ##### Step 3 - install this module:
-* Copy the contents of this repo's folder `luci-wrtbwmon/luasrc/` to the `/usr/lib/lua/luci/` router's folder
+
+* Download the latest `.ipk` file from [releases](https://github.com/Kiougar/luci-wrtbwmon/releases)
+* Copy the file to your router `/tmp` directory
+    * I use the following command: `scp luci_wrtbwmon_*_all.ipk root@192.168.1.1:/tmp/`
+* Install the package `opkg install /tmp/luci_wrtbwmon_*_all.ipk`
 
 ## TODO
 
-* Create an `.ipk` package of this module, to ease installation
 * Add the `.ipk` package to the `OpenWRT` feed
-
 
 ## Contribute
 
@@ -69,5 +72,7 @@ I would appreciate any help.
 
 ## Credits
 
-A big thanks to [pyrovski](https://github.com/pyrovski) for creating `wrtbwmon` 
-and to the [OpenWRT](https://github.com/OpenWRT) organization for creating and maintaining `openwrt` and `luci`  
+A big thanks to
+* [pyrovski](https://github.com/pyrovski) for creating `wrtbwmon` and helping me with creating the `.ipk` package
+* [OpenWRT](https://github.com/OpenWRT) organization for creating and maintaining `openwrt` and `luci`
+* Carl Worth <cworth@east.isi.edu> for his `ipkg-build` script that lies in this repo

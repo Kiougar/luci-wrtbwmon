@@ -60,6 +60,7 @@ For the above commands to work the only *requirement* is that the `wrtbwmon` pac
 * Copy the file to your router `/tmp` directory
     * I use the following command: `scp luci_wrtbwmon_*_all.ipk root@192.168.1.1:/tmp/`
 * Install the package `opkg install /tmp/luci_wrtbwmon_*_all.ipk`
+* Clear the cache for `luci` to get the web interface to refresh `rm /tmp/luci-indexcache`
 
 ## TODO
 

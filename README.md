@@ -38,7 +38,7 @@ For the above commands to work the only *requirement* is that the `wrtbwmon` pac
 
 ## Install
 
-##### Step 1 - install the `wrtbwmon` package (if you have it installed skip to Step 2):
+##### Step 1 - install the `wrtbwmon` package:
 
 * Download the latest `.ipk` file from [wrtbwmon releases](https://github.com/pyrovski/wrtbwmon/releases)
 * Copy the file to your router `/tmp` directory 
@@ -47,8 +47,6 @@ For the above commands to work the only *requirement* is that the `wrtbwmon` pac
         
 ##### Step 2 - setup* the `wrtbwmon` package:
 
-* If you have `wrtbwmon` version `0.35` the init script uses `wrtbwmon.sh` where it was renamed to `wrtbwmon`
-    * to fix: `sed -i 's/wrtbwmon\.sh/wrtbwmon/g' /etc/init.d/wrtbwmon`
 * Schedule it to run on startup `/etc/init.d/wrtbwmon enable`
 * Manually start it now `/etc/init.d/wrtbwmon start`
 

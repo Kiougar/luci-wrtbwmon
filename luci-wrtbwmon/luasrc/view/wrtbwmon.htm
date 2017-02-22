@@ -7,7 +7,7 @@
             <small>Auto update every</small>
             <select id="intervalSelect" style="width:90px;height:20px;font-size:11px;">
                 <option value="-1">Disabled</option>
-                <option value="5" selected>5 seconds</option>
+                <option value="5" selected="selected">5 seconds</option>
                 <option value="10">10 seconds</option>
                 <option value="20">20 seconds</option>
                 <option value="30">30 seconds</option>
@@ -26,6 +26,7 @@
     <tbody id="tableBody"><tr><td>Loading...</td></tr></tbody>
 </table>
 <script>
+    //<![CDATA[
     // interval in seconds
     var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
 
@@ -145,7 +146,7 @@
 
                 // create displayData
                 var displayData = [
-                    '<td title="' + data[1] + '">' + data[0] + '<br>' + data[2] + '</td>',
+                    '<td title="' + data[1] + '">' + data[0] + '<br />' + data[2] + '</td>',
                     '<td align="right">' + getSize(dlSpeed) + '/s</td>',
                     '<td align="right">' + getSize(upSpeed) + '/s</td>',
                     '<td align="right">' + getSize(data[3]) + '</td>',
@@ -238,5 +239,6 @@
 
         receiveData();
     })();
+    //]]>
 </script>
 <%+footer%>

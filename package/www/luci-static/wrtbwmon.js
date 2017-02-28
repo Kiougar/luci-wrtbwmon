@@ -1,0 +1,1 @@
+../../../luci-wrtbwmon/htdocs/luci-static/wrtbwmon.js

@@ -181,10 +181,6 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
         }
     });
 
-    /*document.getElementById('persistCheck').addEventListener('change', function () {
-        var checked = this.checked;
-    });*/
-
     document.getElementById('resetDatabase').addEventListener('click', function () {
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function () {

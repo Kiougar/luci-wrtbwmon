@@ -1,8 +1,9 @@
 <%+header%>
-<h1 style="position:relative;">
-    <span>Network Usage:</span>
-    <button id="resetDatabase" class="cbi-button" style="position: absolute; right: 0;">Reset Database</button>
-</h1>
+<h2>Network Usage:</h2>
+<p style="position:relative;">
+    <a href="<%=controller%>admin/network/usage_config">Configuration</a>
+    <button id="resetDatabase" class="cbi-button" style="position: absolute;right: 0;bottom: 0;">Reset Database</button>
+</p>
 <p>
     <small><span id="updated"></span> <span id="updating"></span></small>
     <span style="float: right">

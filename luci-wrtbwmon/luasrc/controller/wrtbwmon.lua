@@ -2,11 +2,11 @@ module("luci.controller.wrtbwmon", package.seeall)
 
 function index()
     entry({"admin", "network", "usage"}, template("wrtbwmon"), "Usage").dependent=true
+    entry({"admin", "network", "usage_config"}, cbi("wrtbwmon"), "Usage Configuration").dependent=true
     entry({"admin", "network", "usage", "usage_data"}, call("usage_data")).dependent=true
     entry({"admin", "network", "usage_data"}, call("usage_data")).dependent=true
     entry({"admin", "network", "usage", "usage_reset"}, call("usage_reset")).dependent=true
     entry({"admin", "network", "usage_reset"}, call("usage_reset")).dependent=true
-    entry({"admin", "network", "usage_config"}, cbi("wrtbwmon"), "Usage Config").dependent=true
 end
 
 function usage_database_path()

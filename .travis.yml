@@ -1,5 +1,8 @@
 install: true
 script: ./mkipk.sh
+branches:
+  only:
+  - master
 deploy:
   provider: releases
   api_key:

@@ -6,8 +6,9 @@ This Luci module uses [wrtbwmon](https://github.com/pyrovski/wrtbwmon) to track 
 * **Auto refresh** every 5 seconds (can be changed)
 * Track **speed per client** (if auto refresh is enabled)
 * **No cron job** required (wrtbwmon is updated on demand)
+* Ability to **persist database** across reboots and firmware updates
 
-After installation you will see a new `Usage` menu item inside the `Network` menu list in the Luci GUI.
+After installation you will see two new `Usage` and `Usage Configuration` menus items inside the `Network` menu list in the Luci GUI.
 
 ![Network Usage](https://github.com/Kiougar/luci-wrtbwmon/blob/master/screenshot.png?raw=true)
 

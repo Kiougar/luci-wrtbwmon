@@ -1,3 +1,3 @@
 
 config wrtbwmon 'general'
-    option persist '0'
+	option persist '0'

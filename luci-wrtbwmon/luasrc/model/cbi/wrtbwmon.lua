@@ -3,7 +3,7 @@ local m = Map("wrtbwmon", "Network Usage Configuration")
 local s = m:section(NamedSection, "general", "wrtbwmon", "General settings")
 
 local o = s:option(Flag, "persist", "Persist database",
-    "Check this to persist the database file under `/etc/config`. This ensures usage is persisted even across firmware updates.")
+    "Check this to persist the database file under /etc/config. This ensures usage is persisted even across firmware updates.")
 o.rmempty = false
 
 function o.write(self, section, value)

@@ -182,14 +182,16 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
     });
 
     document.getElementById('resetDatabase').addEventListener('click', function () {
-        var ajax = new XMLHttpRequest();
-        ajax.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 204) {
-                location.reload();
-            }
-        };
-        ajax.open('GET', 'usage_reset', true);
-        ajax.send();
+        if (confirm('This will delete the database file. Are you sure?')) {
+            var ajax = new XMLHttpRequest();
+            ajax.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 204) {
+                    location.reload();
+                }
+            };
+            ajax.open('GET', 'usage_reset', true);
+            ajax.send();
+        }
     });
 
     function stopSchedule() {

@@ -13,3 +13,4 @@ deploy:
   on:
     repo: Kiougar/luci-wrtbwmon
     tags: true
+    all_branches: true

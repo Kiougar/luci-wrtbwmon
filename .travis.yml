@@ -2,7 +2,7 @@ install: true
 script: ./mkipk.sh
 branches:
   only:
-  - master
+  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 deploy:
   provider: releases
   api_key:
@@ -13,4 +13,3 @@ deploy:
   on:
     repo: Kiougar/luci-wrtbwmon
     tags: true
-    all_branches: true

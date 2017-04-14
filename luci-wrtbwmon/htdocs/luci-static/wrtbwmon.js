@@ -90,8 +90,8 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
             var oldData;
             for (var i = 0; i < oldValues.length; i++) {
                 var cur = oldValues[i];
-                // compare mac addresses
-                if (oldValues[i][1] === data[1]) {
+                // compare mac addresses and ip addresses
+                if (oldValues[i][1] === data[1] && oldValues[i][2] === data[2]) {
                     oldData = cur;
                     break;
                 }

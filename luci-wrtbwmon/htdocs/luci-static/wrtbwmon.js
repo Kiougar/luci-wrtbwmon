@@ -1,5 +1,6 @@
 // interval in seconds
 var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
+var sortedColumn = 7, sortedEltId = "thTotal", sortDirection = "desc";
 
 (function () {
     var oldDate, oldValues = [];
@@ -50,26 +51,30 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
             }
         }
 
-        // sort data
         data.sort(function (x, y) {
-            var a = x[1], b = y[1];
-            for (var i = 3; i <= 7; i++) {
-                if (a[i] < b[i]) return 1;
-                if (a[i] > b[i]) return -1;
+            var a = x[1][sortedColumn];
+            var b = y[1][sortedColumn];
+            if (sortDirection == "desc") {
+                    if (a < b) return 1;
+                    if (a > b) return -1;
+                    return 0;
+            } else {
+                    if (a > b) return 1;
+                    if (a < b) return -1;
+                    return 0;
             }
-            return 0;
         });
 
         // display data
         var result = '<tr>\
-                            <th>Client</th>\
-                            <th>Download</th>\
-                            <th>Upload</th>\
-                            <th>Total Down</th>\
-                            <th>Total Up</th>\
-                            <th>Total</th>\
-                            <th>First Seen</th>\
-                            <th>Last Seen</th>\
+                            <th id="thClient">Client</th>\
+                            <th id="thDownload">Download</th>\
+                            <th id="thUpload">Upload</th>\
+                            <th id="thTotalDown">Total Down</th>\
+                            <th id="thTotalUp">Total Up</th>\
+                            <th id="thTotal">Total</th>\
+                            <th id="thFirstSeen">First Seen</th>\
+                            <th id="thLastSeen">Last Seen</th>\
                           </tr>';
         for (var k = 0; k < data.length; k++) {
             result += data[k][0];
@@ -137,6 +142,28 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
         }
     }
 
+    function registerTableEventHandlers() {
+        // note these ordinals are into the data array, not the table output
+        document.getElementById('thClient').addEventListener('click', function () {
+            setSortColumn(this.id, 0, true); // hostname
+        });
+        document.getElementById('thDownload').addEventListener('click', function () {
+            setSortColumn(this.id, 3, true); // dlspeed
+        });
+        document.getElementById('thUpload').addEventListener('click', function () {
+            setSortColumn(this.id, 4, true); // ulspeed
+        });
+        document.getElementById('thTotalDown').addEventListener('click', function () {
+            setSortColumn(this.id, 5, true); // total down
+        });
+        document.getElementById('thTotalUp').addEventListener('click', function () {
+            setSortColumn(this.id, 6, true); // total up
+        });
+        document.getElementById('thTotal').addEventListener('click', function () {
+            setSortColumn(this.id, 7, true); // total
+        });
+    }
+
     function receiveData(once) {
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function () {
@@ -154,6 +181,7 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
                         handleError();
                     } else {
                         document.getElementById('tableBody').innerHTML = handleValues(v);
+                        setSortColumn(null, null, false);
                         // set old values
                         oldValues = v;
                         // set old date
@@ -221,5 +249,25 @@ var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
         }
     }
 
+    function setSortColumn(eltid, col, do_sort = false) {
+        if (col && col == sortedColumn) {
+            if (sortDirection == "desc")
+                sortDirection = "asc";
+            else
+                sortDirection = "desc";
+        } else {
+            sortDirection = "desc";
+        }
+        sortedColumn = col ? col : sortedColumn;
+        sortedEltId = eltid ? eltid : sortedEltId;
+        if (do_sort)
+            document.getElementById('tableBody').innerHTML = handleValues(oldValues);
+        e = document.getElementById(sortedEltId);
+        if (e)
+            e.innerHTML = e.innerHTML + (sortDirection == "asc" ? "&#x25B2" : "&#x25BC");
+        registerTableEventHandlers();
+    }
+
     receiveData();
+
 })();

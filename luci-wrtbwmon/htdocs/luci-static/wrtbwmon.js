@@ -250,7 +250,7 @@ var sortedColumn = 7, sortedEltId = "thTotal", sortDirection = "desc";
     }
 
     function setSortColumn(eltid, col, do_sort = false) {
-        if (col && col == sortedColumn) {
+        if (col != null && col == sortedColumn) {
             if (sortDirection == "desc")
                 sortDirection = "asc";
             else
@@ -258,7 +258,7 @@ var sortedColumn = 7, sortedEltId = "thTotal", sortDirection = "desc";
         } else {
             sortDirection = "desc";
         }
-        sortedColumn = col ? col : sortedColumn;
+        sortedColumn = col != null ? col : sortedColumn;
         sortedEltId = eltid ? eltid : sortedEltId;
         if (do_sort)
             document.getElementById('tableBody').innerHTML = handleValues(oldValues);

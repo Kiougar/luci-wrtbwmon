@@ -1,7 +1,7 @@
 // interval in seconds
 var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
 var sortedColumn = 7, sortedEltId = "thTotal", sortDirection = "desc";
-var groupByHost = false;
+var perHostTotals = false, showPerHostTotalsOnly = false;
 
 (function () {
     var oldDate, oldValues = [];
@@ -52,6 +52,41 @@ var groupByHost = false;
             }
         }
 
+        // aggregate (sub-total) by hostname (or MAC address) after the global totals are computed, before sort and display
+        if (perHostTotals) {
+            var curHost = 0, insertAt = 1;
+            while (curHost < data.length && insertAt < data.length) {
+                // grab the current hostname/mac, and walk the data looking for rows with the same host/mac
+                var hostName = data[curHost][1][0].toLowerCase();
+                for (var k = curHost+1; k < data.length; k++) {
+                    if (data[k][1][0].toLowerCase() == hostName) {
+                        // this is another row for the same host, group it with any other rows for this host
+                        data.splice(insertAt, 0, data.splice(k, 1)[0]);
+                        insertAt++;
+                    }
+                }
+
+                // if we found more than one row for the host, add a subtotal row
+                if (insertAt > curHost+1) {
+                    var hostTotals = [data[curHost][1][0], '', '', 0, 0, 0, 0, 0];
+                    for (var i = curHost; i < insertAt && i < data.length; i++) {
+                        for (var j = 3; j < hostTotals.length; j++) {
+                            hostTotals[j] += data[i][1][j];
+                        }
+                    }
+                    var hostTotalRow = '<tr><th title="' + data[curHost][1][1] + '">' + data[curHost][1][0] + '<br/> (host total) </th>';
+                    for (var m = 3; m < hostTotals.length; m++) {
+                        var t = hostTotals[m];
+                        hostTotalRow += '<td align="right">' + getSize(t) + (m < 5 ? '/s' : '') + '</td>'
+                    }
+                    hostTotalRow += '</tr>';
+                    data.splice(insertAt, 0, [hostTotalRow, hostTotals]);
+                }
+                curHost = insertAt+1;
+                insertAt = curHost+1;
+            }
+        }
+
         data.sort(function (x, y) {
             var a = x[1][sortedColumn];
             var b = y[1][sortedColumn];
@@ -65,43 +100,6 @@ var groupByHost = false;
                     return 0;
             }
         });
-
-        // we've already sorted by the desired column, now optionally group by hostname (or MAC address)
-        if (groupByHost && sortedColumn != 0) {
-            var prevHost = 0;
-            var curHost = 0;
-            var insertAt = 1;
-            while (curHost < data.length && insertAt < data.length) {
-                // grab the current hostname/mac, and walk the data looking for rows with the same host/mac
-                var hostName = data[curHost][1][0].toLowerCase();
-                for (var k = insertAt; k < data.length; k++) {
-                    if (data[k][1][0].toLowerCase() == hostName) {
-                        // this is another row for the same host, group it with any other rows for this host
-                        data.splice(insertAt, 0, data.splice(k, 1)[0]);
-                        insertAt++;
-                    }
-                }
-                // if we found more than one row for the host, add a subtotal row
-                if (insertAt > curHost + 1) {
-                    var hostTotals = [0, 0, 0, 0, 0];
-                    for (var i = curHost; i < insertAt; i++) {
-                        for (var j = 0; j < hostTotals.length; j++) {
-                            hostTotals[j] += data[i][1][3 + j];
-                        }
-                    }
-                    var hostTotalRow = '<tr><th>' + data[curHost][1][0] + '</th>';
-                    for (var m = 0; m < hostTotals.length; m++) {
-                        var t = hostTotals[m];
-                        hostTotalRow += '<td align="right">' + getSize(t) + (m < 2 ? '/s' : '') + '</td>'
-                    }
-                    hostTotalRow += '</tr>';
-                    data.splice(insertAt, 0, [hostTotalRow]);
-                }
-                prevHost = curHost;
-                curHost = insertAt+1;
-                insertAt = curHost+1;
-            }
-        }
 
         // display data
         var result = '<tr>\
@@ -260,9 +258,14 @@ var groupByHost = false;
         }
     });
 
-    document.getElementById('groupByHost').addEventListener('change', function () {
-        groupByHost = !groupByHost;
+    document.getElementById('perHostTotals').addEventListener('change', function () {
+        perHostTotals = !perHostTotals;
     });
+
+    //document.getElementById('showPerHostTotalsOnly').addEventListener('change', function () {
+    //    showPerHostTotalsOnly = !showPerHostTotalsOnly;
+    //});
+
 
     function stopSchedule() {
         window.clearTimeout(scheduleTimeout);

@@ -82,7 +82,7 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
                     hostTotalRow += '</tr>';
                     data.splice(insertAt, 0, [hostTotalRow, hostTotals]);
                 }
-                curHost = insertAt+1;
+                curHost = insertAt;
                 insertAt = curHost+1;
             }
         }

@@ -1,4 +1,4 @@
-# Bandwidth tracker for OpenWRT
+# Bandwidth tracker for OpenWRT [![Build Status](https://travis-ci.org/Kiougar/luci-wrtbwmon.svg?branch=master)](https://travis-ci.org/Kiougar/luci-wrtbwmon)
 
 This Luci module uses [wrtbwmon](https://github.com/pyrovski/wrtbwmon) to track bandwidth usage.
 

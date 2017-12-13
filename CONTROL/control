@@ -1,5 +1,6 @@
 Package: luci-wrtbwmon
 Version: 0.6.0
+Depends: luci, wrtbwmon
 Architecture: all
 Maintainer: Georgios Tzourmpakis <kiougar@gmail.com>
 Section: net

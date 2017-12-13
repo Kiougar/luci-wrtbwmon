@@ -1,12 +1,11 @@
 <%+header%>
-<h2>Network Usage:</h2>
+<h2>Usage - Details</h2>
 <p style="position:relative;">
-    <a href="<%=controller%>/admin/network/usage_config">Configuration</a>
-    <button id="resetDatabase" class="cbi-button" style="position: absolute;right: 0;bottom: 0;">Reset Database</button>
+    <button id="resetDatabase" class="cbi-button" style="position:absolute;right:0;bottom:0;">Reset Database</button>
 </p>
 <p>
     <small><span id="updated"></span> <span id="updating"></span></small>
-    <span style="float: right">
+    <span style="float:right;text-align:right;">
         <label>
             <small>Auto update every</small>
             <select id="intervalSelect" style="width:90px;height:20px;font-size:11px;">
@@ -30,8 +29,8 @@
         </label>
         <br/>
         <label>
-            <small>Calculate per host totals at update</small>
-            <input id="perHostTotals" type="checkbox"/>
+            <small>Calculate per host totals</small>
+            <input id="perHostTotals" type="checkbox" style="vertical-align:middle;"/>
         </label>
         <!-- label>
             <small>Show per host aggregates only</small>

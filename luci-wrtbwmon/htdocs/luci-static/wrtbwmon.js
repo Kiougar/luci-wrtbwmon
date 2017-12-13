@@ -6,6 +6,10 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
 (function () {
     var oldDate, oldValues = [];
 
+    // find base path
+    var re = /(.*?admin\/network\/[^/]+)/;
+    var basePath = window.location.pathname.match(re)[1];
+
     function getSize(size) {
         var prefix = [' ', 'k', 'M', 'G', 'T', 'P', 'E', 'Z'];
         var precision, base = 1000, pos = 0;
@@ -228,7 +232,7 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
                 if (!once && interval > 0) reschedule(interval);
             }
         };
-        ajax.open('GET', 'usage_data', true);
+        ajax.open('GET', basePath + '/usage_data', true);
         ajax.send();
     }
 
@@ -253,7 +257,7 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
                     location.reload();
                 }
             };
-            ajax.open('GET', 'usage_reset', true);
+            ajax.open('GET', basePath + '/usage_reset', true);
             ajax.send();
         }
     });
@@ -313,6 +317,22 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
         registerTableEventHandlers();
     }
 
-    receiveData();
+    // if dependency is successful run callback
+    function checkForDependency(cb) {
+        var ajax = new XMLHttpRequest();
+        ajax.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                if (ajax.responseText == "1") {
+                    cb();
+                } else {
+                    alert("wrtbwmon is not installed!");
+                }
+            }
+        };
+        ajax.open('GET', basePath + '/check_dependency', true);
+        ajax.send();
+    }
+
+    checkForDependency(receiveData);
 
 })();

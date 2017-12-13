@@ -1,8 +1,16 @@
-install: true
+language: bash
+
+addons:
+    apt:
+        packages:
+        - fakeroot
+
 script: ./mkipk.sh
+
 branches:
   only:
   - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
 deploy:
   provider: releases
   api_key:

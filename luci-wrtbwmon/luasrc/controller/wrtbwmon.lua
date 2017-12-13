@@ -19,11 +19,6 @@ function usage_database_path()
     end
 end
 
-function user_file_path()
-    local cursor = luci.model.uci.cursor()
-    return cursor:get("wrtbwmon", "general", "user_file")
-end
-
 function check_dependency()
     local ret = "0"
     if require("luci.model.ipkg").installed('wrtbwmon') then
@@ -36,11 +31,6 @@ end
 function usage_data()
     local db = usage_database_path()
     local publish_cmd = "wrtbwmon publish " .. db .. " /tmp/usage.htm /etc/wrtbwmon.user"
-    -- if user_file is configured use it
-    --local user_file = user_file_path()
-    --if not user_file == nil and not user_file == '' then
-    --    publish_cmd = publish_cmd .. " " .. user_file
-    --end
     local cmd = "wrtbwmon update " .. db .. " && " .. publish_cmd .. " && cat /tmp/usage.htm"
     luci.http.prepare_content("text/html")
     luci.http.write(luci.sys.exec(cmd))

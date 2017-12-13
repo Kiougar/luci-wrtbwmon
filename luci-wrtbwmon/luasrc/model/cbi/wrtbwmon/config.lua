@@ -16,10 +16,4 @@ function o.write(self, section, value)
     return Flag.write(self, section ,value)
 end
 
---o = s:option(Value, "user_file", "User file location", 
---    "Enter the absolute path of the user file. "
---    .. "An optional file to match users with MAC addresses. "
---    .. "Its format is \"00:aa:bb:cc:ee:ff,username\" with one entry per line.")
---o.rmempty = true
-
 return m

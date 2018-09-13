@@ -364,10 +364,10 @@ var wrt = {
 
     /**
      * Sets the relevant global sort variables and re-renders the table to apply the new sorting
-     * @param column
      * @param elId
+     * @param column
      */
-    function setSortColumn(column, elId) {
+    function setSortColumn(elId, column) {
         if (column === wrt.sortData.column) {
             // same column clicked, switch direction
             wrt.sortData.dir = wrt.sortData.dir === 'desc' ? 'asc' : 'desc';

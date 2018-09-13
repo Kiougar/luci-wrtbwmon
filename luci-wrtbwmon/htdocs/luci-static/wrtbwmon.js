@@ -1,7 +1,19 @@
-// interval in seconds
-var scheduleTimeout, updateTimeout, isScheduled = true, interval = 5;
-var sortedColumn = 7, sortedEltId = "thTotal", sortDirection = "desc";
-var perHostTotals = false, showPerHostTotalsOnly = false;
+var wrt = {
+    // variables for auto-update, interval is in seconds
+    scheduleTimeout: undefined,
+    updateTimeout: undefined,
+    isScheduled: true,
+    interval: 5,
+    // option on whether to show per host sub-totals
+    perHostTotals: false,
+    // variables for sorting
+    sortData: {
+        column: 7,
+        elId: 'thTotal',
+        dir: 'desc',
+        cache: {}
+    }
+};
 
 (function () {
     var oldDate, oldValues = [];
@@ -10,6 +22,15 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
     var re = /(.*?admin\/network\/[^/]+)/;
     var basePath = window.location.pathname.match(re)[1];
 
+    //----------------------
+    // HELPER FUNCTIONS
+    //----------------------
+
+    /**
+     * Human readable text for size
+     * @param size
+     * @returns {string}
+     */
     function getSize(size) {
         var prefix = [' ', 'k', 'M', 'G', 'T', 'P', 'E', 'Z'];
         var precision, base = 1000, pos = 0;
@@ -21,32 +42,105 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
         return (Math.round(size * precision) / precision) + ' ' + prefix[pos] + 'B';
     }
 
+    /**
+     * Human readable text for date
+     * @param date
+     * @returns {string}
+     */
     function dateToString(date) {
         return date.toString().substring(0, 24);
     }
 
+    /**
+     * Gets the string representation of the date received from BE
+     * @param value
+     * @returns {*}
+     */
     function getDateString(value) {
         var tmp = value.split('_'),
             str = tmp[0].split('-').reverse().join('-') + 'T' + tmp[1];
         return dateToString(new Date(str));
     }
 
+    /**
+     * Returns true if obj is instance of Array
+     * @param obj
+     * @returns {boolean}
+     */
     function isArray(obj) {
         return obj instanceof Array;
     }
 
+    //----------------------
+    // END HELPER FUNCTIONS
+    //----------------------
+
+    /**
+     * Handle the error that happened during the call to the BE
+     */
     function handleError() {
         // TODO handle errors
         // var message = 'Something went wrong...';
     }
 
+    /**
+     * Handle the new `values` that were received from the BE
+     * @param values
+     * @returns {string}
+     */
     function handleValues(values) {
         if (!isArray(values)) return '';
 
-        // find data
+        // find data and totals
+        var res = parseValues(values);
+        var data = res[0];
+        var totals = res[1];
+
+        // aggregate (sub-total) by hostname (or MAC address) after the global totals are computed, before sort and display
+        aggregateHostTotals(data);
+
+        // store them in cache for quicker re-rendering
+        wrt.sortData.cache.data = data;
+        wrt.sortData.cache.totals = totals;
+
+        renderTableData(data, totals);
+    }
+
+    /**
+     * Renders the table body
+     * @param data
+     * @param totals
+     */
+    function renderTableData(data, totals) {
+        // sort data
+        data.sort(sortingFunction);
+
+        // display data
+        document.getElementById('tableBody').innerHTML = getDisplayData(data, totals);
+
+        // set sorting arrows
+        var el = document.getElementById(wrt.sortData.elId);
+        if (el) {
+            el.innerHTML = el.innerHTML + (wrt.sortData.dir === 'desc' ? '&#x25BC' : '&#x25B2');
+        }
+
+        // register table events
+        registerTableEventHandlers();
+    }
+
+    /**
+     * Parses the values and returns a data array, where each element in the data array is an array with two elements,
+     * and a totals array, that holds aggregated values for each column.
+     * The first element of each row in the data array, is the HTML output of the row as a `<tr>` element
+     * and the second is the actual data:
+     *  [ result, data ]
+     * @param values The `values` array
+     * @returns {Array}
+     */
+    function parseValues(values) {
         var data = [], totals = [0, 0, 0, 0, 0];
         for (var i = 0; i < values.length; i++) {
-            var d = handleRow(values[i]);
+            var d = parseValueRow(values[i]);
             if (d[1]) {
                 data.push(d);
                 // get totals
@@ -56,56 +150,77 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
             }
         }
 
-        // aggregate (sub-total) by hostname (or MAC address) after the global totals are computed, before sort and display
-        if (perHostTotals) {
-            var curHost = 0, insertAt = 1;
-            while (curHost < data.length && insertAt < data.length) {
-                // grab the current hostname/mac, and walk the data looking for rows with the same host/mac
-                var hostName = data[curHost][1][0].toLowerCase();
-                for (var k = curHost+1; k < data.length; k++) {
-                    if (data[k][1][0].toLowerCase() == hostName) {
-                        // this is another row for the same host, group it with any other rows for this host
-                        data.splice(insertAt, 0, data.splice(k, 1)[0]);
-                        insertAt++;
-                    }
-                }
+        return [data, totals];
+    }
 
-                // if we found more than one row for the host, add a subtotal row
-                if (insertAt > curHost+1) {
-                    var hostTotals = [data[curHost][1][0], '', '', 0, 0, 0, 0, 0];
-                    for (var i = curHost; i < insertAt && i < data.length; i++) {
-                        for (var j = 3; j < hostTotals.length; j++) {
-                            hostTotals[j] += data[i][1][j];
-                        }
-                    }
-                    var hostTotalRow = '<tr><th title="' + data[curHost][1][1] + '">' + data[curHost][1][0] + '<br/> (host total) </th>';
-                    for (var m = 3; m < hostTotals.length; m++) {
-                        var t = hostTotals[m];
-                        hostTotalRow += '<td align="right">' + getSize(t) + (m < 5 ? '/s' : '') + '</td>'
-                    }
-                    hostTotalRow += '</tr>';
-                    data.splice(insertAt, 0, [hostTotalRow, hostTotals]);
-                }
-                curHost = insertAt;
-                insertAt = curHost+1;
+    /**
+     * Parse each row in the `values` array and return an array with two elements.
+     * The first element is the HTML output of the row as a `<tr>` element and the second is the actual data
+     *    [ result, data ]
+     * @param data A row from the `values` array
+     * @returns {[ string, [] ]}
+     */
+    function parseValueRow(data) {
+        // check if data is array
+        if (!isArray(data)) return [''];
+
+        // find old data
+        var oldData;
+        for (var i = 0; i < oldValues.length; i++) {
+            var cur = oldValues[i];
+            // compare mac addresses and ip addresses
+            if (oldValues[i][1] === data[1] && oldValues[i][2] === data[2]) {
+                oldData = cur;
+                break;
             }
         }
 
-        data.sort(function (x, y) {
-            var a = x[1][sortedColumn];
-            var b = y[1][sortedColumn];
-            if (sortDirection == "desc") {
-                    if (a < b) return 1;
-                    if (a > b) return -1;
-                    return 0;
-            } else {
-                    if (a > b) return 1;
-                    if (a < b) return -1;
-                    return 0;
-            }
-        });
+        // find download and upload speeds
+        var dlSpeed = 0, upSpeed = 0;
+        if (oldData) {
+            var now = new Date(),
+                seconds = (now - oldDate) / 1000;
+            dlSpeed = (data[3] - oldData[3]) / seconds;
+            upSpeed = (data[4] - oldData[4]) / seconds;
+        }
 
-        // display data
+        // create rowData
+        var rowData = [];
+        for (var j = 0; j < data.length; j++) {
+            rowData.push(data[j]);
+            if (j === 2) {
+                rowData.push(dlSpeed, upSpeed);
+            }
+        }
+
+        // create displayData
+        var displayData = [
+            '<td title="' + data[1] + '">' + data[0] + '<br />' + data[2] + '</td>',
+            '<td align="right">' + getSize(dlSpeed) + '/s</td>',
+            '<td align="right">' + getSize(upSpeed) + '/s</td>',
+            '<td align="right">' + getSize(data[3]) + '</td>',
+            '<td align="right">' + getSize(data[4]) + '</td>',
+            '<td align="right">' + getSize(data[5]) + '</td>',
+            '<td>' + getDateString(data[6]) + '</td>',
+            '<td>' + getDateString(data[7]) + '</td>'
+        ];
+
+        // display row data
+        var result = '<tr>';
+        for (var k = 0; k < displayData.length; k++) {
+            result += displayData[k];
+        }
+        result += '</tr>';
+        return [result, rowData];
+    }
+
+    /**
+     * Creates the HTML output based on the `data` and `totals` inputs
+     * @param data
+     * @param totals
+     * @returns {string} HTML output
+     */
+    function getDisplayData(data, totals) {
         var result = '<tr>\
                             <th id="thClient">Client</th>\
                             <th id="thDownload">Download</th>\
@@ -126,87 +241,122 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
         }
         result += '</tr>';
         return result;
+    }
 
-        function handleRow(data) {
-            // check if data is array
-            if (!isArray(data)) return [''];
+    /**
+     * Calculates per host sub-totals and adds them in the data input
+     * @param data The data input
+     */
+    function aggregateHostTotals(data) {
+        if (!wrt.perHostTotals) return;
 
-            // find old data
-            var oldData;
-            for (var i = 0; i < oldValues.length; i++) {
-                var cur = oldValues[i];
-                // compare mac addresses and ip addresses
-                if (oldValues[i][1] === data[1] && oldValues[i][2] === data[2]) {
-                    oldData = cur;
-                    break;
+        var curHost = 0, insertAt = 1;
+        while (curHost < data.length && insertAt < data.length) {
+            // grab the current hostname/mac, and walk the data looking for rows with the same host/mac
+            var hostName = data[curHost][1][0].toLowerCase();
+            for (var k = curHost + 1; k < data.length; k++) {
+                if (data[k][1][0].toLowerCase() === hostName) {
+                    // this is another row for the same host, group it with any other rows for this host
+                    data.splice(insertAt, 0, data.splice(k, 1)[0]);
+                    insertAt++;
                 }
             }
 
-            // find download and upload speeds
-            var dlSpeed = 0, upSpeed = 0;
-            if (oldData) {
-                var now = new Date(),
-                    seconds = (now - oldDate) / 1000;
-                dlSpeed = (data[3] - oldData[3]) / seconds;
-                upSpeed = (data[4] - oldData[4]) / seconds;
-            }
-
-            // create rowData
-            var rowData = [];
-            for (var j = 0; j < data.length; j++) {
-                rowData.push(data[j]);
-                if (j === 2) {
-                    rowData.push(dlSpeed, upSpeed);
+            // if we found more than one row for the host, add a subtotal row
+            if (insertAt > curHost + 1) {
+                var hostTotals = [data[curHost][1][0], '', '', 0, 0, 0, 0, 0];
+                for (var i = curHost; i < insertAt && i < data.length; i++) {
+                    for (var j = 3; j < hostTotals.length; j++) {
+                        hostTotals[j] += data[i][1][j];
+                    }
                 }
+                var hostTotalRow = '<tr><th title="' + data[curHost][1][1] + '">' + data[curHost][1][0] + '<br/> (host total) </th>';
+                for (var m = 3; m < hostTotals.length; m++) {
+                    var t = hostTotals[m];
+                    hostTotalRow += '<td align="right">' + getSize(t) + (m < 5 ? '/s' : '') + '</td>'
+                }
+                hostTotalRow += '</tr>';
+                data.splice(insertAt, 0, [hostTotalRow, hostTotals]);
             }
-
-            // create displayData
-            var displayData = [
-                '<td title="' + data[1] + '">' + data[0] + '<br />' + data[2] + '</td>',
-                '<td align="right">' + getSize(dlSpeed) + '/s</td>',
-                '<td align="right">' + getSize(upSpeed) + '/s</td>',
-                '<td align="right">' + getSize(data[3]) + '</td>',
-                '<td align="right">' + getSize(data[4]) + '</td>',
-                '<td align="right">' + getSize(data[5]) + '</td>',
-                '<td>' + getDateString(data[6]) + '</td>',
-                '<td>' + getDateString(data[7]) + '</td>'
-            ];
-
-            // display row data
-            var result = '<tr>';
-            for (var k = 0; k < displayData.length; k++) {
-                result += displayData[k];
-            }
-            result += '</tr>';
-            return [result, rowData];
+            curHost = insertAt;
+            insertAt = curHost + 1;
         }
     }
 
+    /**
+     * Sorting function used to sort the `data`. Uses the global sort settings
+     * @param x first item to compare
+     * @param y second item to compare
+     * @returns {number} 1 for desc, -1 for asc, 0 for equal
+     */
+    function sortingFunction(x, y) {
+        // get data from global variable
+        var sortColumn = wrt.sortData.column, sortDirection = wrt.sortData.dir;
+        var a = x[1][sortColumn];
+        var b = y[1][sortColumn];
+        if (a === b) {
+            return 0;
+        } else if (sortDirection === 'desc') {
+            return a < b ? 1 : -1;
+        } else {
+            return a > b ? 1 : -1;
+        }
+    }
+
+    /**
+     * Sets the relevant global sort variables and re-renders the table to apply the new sorting
+     * @param column
+     * @param elId
+     */
+    function setSortColumn(column, elId) {
+        if (column === wrt.sortData.column) {
+            // same column clicked, switch direction
+            wrt.sortData.dir = wrt.sortData.dir === 'desc' ? 'asc' : 'desc';
+        } else {
+            // change sort column
+            wrt.sortData.column = column;
+            // reset sort direction
+            wrt.sortData.dir = 'desc';
+        }
+        wrt.sortData.elId = elId;
+
+        // render table data from cache
+        renderTableData(wrt.sortData.cache.data, wrt.sortData.cache.totals);
+    }
+
+    /**
+     * Registers the table events handlers for sorting when clicking the column headers
+     */
     function registerTableEventHandlers() {
         // note these ordinals are into the data array, not the table output
         document.getElementById('thClient').addEventListener('click', function () {
-            setSortColumn(this.id, 0, true); // hostname
+            setSortColumn(this.id, 0); // hostname
         });
         document.getElementById('thDownload').addEventListener('click', function () {
-            setSortColumn(this.id, 3, true); // dlspeed
+            setSortColumn(this.id, 3); // dl speed
         });
         document.getElementById('thUpload').addEventListener('click', function () {
-            setSortColumn(this.id, 4, true); // ulspeed
+            setSortColumn(this.id, 4); // ul speed
         });
         document.getElementById('thTotalDown').addEventListener('click', function () {
-            setSortColumn(this.id, 5, true); // total down
+            setSortColumn(this.id, 5); // total down
         });
         document.getElementById('thTotalUp').addEventListener('click', function () {
-            setSortColumn(this.id, 6, true); // total up
+            setSortColumn(this.id, 6); // total up
         });
         document.getElementById('thTotal').addEventListener('click', function () {
-            setSortColumn(this.id, 7, true); // total
+            setSortColumn(this.id, 7); // total
         });
     }
 
+    /**
+     * Fetches and handles the updated `values` from the BE
+     * @param once If set to true, it re-schedules itself for execution based on selected interval
+     */
     function receiveData(once) {
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function () {
+            // noinspection EqualityComparisonWithCoercionJS
             if (this.readyState == 4 && this.status == 200) {
                 var re = /(var values = new Array[^;]*;)/,
                     match = ajax.responseText.match(re);
@@ -220,8 +370,7 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
                     if (!v) {
                         handleError();
                     } else {
-                        document.getElementById('tableBody').innerHTML = handleValues(v);
-                        setSortColumn(null, null, false);
+                        handleValues(v);
                         // set old values
                         oldValues = v;
                         // set old date
@@ -229,99 +378,110 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
                         document.getElementById('updated').innerHTML = 'Last updated ' + dateToString(oldDate);
                     }
                 }
-                if (!once && interval > 0) reschedule(interval);
+                var int = wrt.interval;
+                if (!once && int > 0) reschedule(int);
             }
         };
         ajax.open('GET', basePath + '/usage_data', true);
         ajax.send();
     }
 
-    document.getElementById('intervalSelect').addEventListener('change', function () {
-        interval = this.value;
-        if (interval > 0) {
-            // it is not scheduled, schedule it
-            if (!isScheduled) {
-                reschedule(interval);
-            }
-        } else {
-            // stop the scheduling
-            stopSchedule();
-        }
-    });
-
-    document.getElementById('resetDatabase').addEventListener('click', function () {
-        if (confirm('This will delete the database file. Are you sure?')) {
-            var ajax = new XMLHttpRequest();
-            ajax.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 204) {
-                    location.reload();
+    /**
+     * Registers DOM event listeners for user interaction
+     */
+    function addEventListeners() {
+        document.getElementById('intervalSelect').addEventListener('change', function () {
+            var int = wrt.interval = this.value;
+            if (int > 0) {
+                // it is not scheduled, schedule it
+                if (!wrt.isScheduled) {
+                    reschedule(int);
                 }
-            };
-            ajax.open('GET', basePath + '/usage_reset', true);
-            ajax.send();
-        }
-    });
+            } else {
+                // stop the scheduling
+                stopSchedule();
+            }
+        });
 
-    document.getElementById('perHostTotals').addEventListener('change', function () {
-        perHostTotals = !perHostTotals;
-    });
+        document.getElementById('resetDatabase').addEventListener('click', function () {
+            if (confirm('This will delete the database file. Are you sure?')) {
+                var ajax = new XMLHttpRequest();
+                ajax.onreadystatechange = function () {
+                    // noinspection EqualityComparisonWithCoercionJS
+                    if (this.readyState == 4 && this.status == 204) {
+                        location.reload();
+                    }
+                };
+                ajax.open('GET', basePath + '/usage_reset', true);
+                ajax.send();
+            }
+        });
 
-    //document.getElementById('showPerHostTotalsOnly').addEventListener('change', function () {
-    //    showPerHostTotalsOnly = !showPerHostTotalsOnly;
-    //});
-
-
-    function stopSchedule() {
-        window.clearTimeout(scheduleTimeout);
-        window.clearTimeout(updateTimeout);
-        setUpdateMessage('');
-        isScheduled = false;
+        document.getElementById('perHostTotals').addEventListener('change', function () {
+            wrt.perHostTotals = !wrt.perHostTotals;
+        });
     }
 
+    //----------------------
+    // AUTO-UPDATE
+    //----------------------
+
+    /**
+     * Stop auto-update schedule
+     */
+    function stopSchedule() {
+        window.clearTimeout(wrt.scheduleTimeout);
+        window.clearTimeout(wrt.updateTimeout);
+        setUpdateMessage('');
+        wrt.isScheduled = false;
+    }
+
+    /**
+     * Start auto-update schedule
+     * @param seconds
+     */
     function reschedule(seconds) {
-        isScheduled = true;
+        wrt.isScheduled = true;
         seconds = seconds || 60;
         updateSeconds(seconds);
-        scheduleTimeout = window.setTimeout(receiveData, seconds * 1000);
+        wrt.scheduleTimeout = window.setTimeout(receiveData, seconds * 1000);
     }
 
+    /**
+     * Sets the text of the `#updating` element
+     * @param msg
+     */
     function setUpdateMessage(msg) {
         document.getElementById('updating').innerHTML = msg;
     }
 
+    /**
+     * Updates the 'Updating in X seconds' message
+     * @param start
+     */
     function updateSeconds(start) {
         setUpdateMessage('Updating again in <b>' + start + '</b> seconds.');
         if (start > 0) {
-            updateTimeout = window.setTimeout(function () {
+            wrt.updateTimeout = window.setTimeout(function () {
                 updateSeconds(start - 1);
             }, 1000);
         }
     }
 
-    function setSortColumn(eltid, col, do_sort = false) {
-        if (col != null && col == sortedColumn) {
-            if (sortDirection == "desc")
-                sortDirection = "asc";
-            else
-                sortDirection = "desc";
-        } else {
-            sortDirection = "desc";
-        }
-        sortedColumn = col != null ? col : sortedColumn;
-        sortedEltId = eltid ? eltid : sortedEltId;
-        if (do_sort)
-            document.getElementById('tableBody').innerHTML = handleValues(oldValues);
-        e = document.getElementById(sortedEltId);
-        if (e)
-            e.innerHTML = e.innerHTML + (sortDirection == "asc" ? "&#x25B2" : "&#x25BC");
-        registerTableEventHandlers();
-    }
+    //----------------------
+    // END AUTO-UPDATE
+    //----------------------
 
-    // if dependency is successful run callback
+    /**
+     * Check for dependency, and if all is well, run callback
+     * @param cb Callback function
+     */
     function checkForDependency(cb) {
         var ajax = new XMLHttpRequest();
         ajax.onreadystatechange = function () {
+            // noinspection EqualityComparisonWithCoercionJS
             if (this.readyState == 4 && this.status == 200) {
+                // noinspection EqualityComparisonWithCoercionJS
                 if (ajax.responseText == "1") {
                     cb();
                 } else {
@@ -333,6 +493,11 @@ var perHostTotals = false, showPerHostTotalsOnly = false;
         ajax.send();
     }
 
-    checkForDependency(receiveData);
+    checkForDependency(function () {
+        // register events
+        addEventListeners();
+        // Main entry point
+        receiveData();
+    });
 
 })();

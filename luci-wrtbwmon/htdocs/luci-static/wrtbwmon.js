@@ -63,6 +63,65 @@ var wrt = {
     }
 
     /**
+     * Create a `tr` element with content
+     * @param content
+     * @returns {string}
+     */
+    function createTR(content) {
+        var res = '<tr';
+        res += ' class="tr">';
+        res += content;
+        res += '</tr>';
+
+        return res;
+    }
+
+    /**
+     * Create a `th` element with content and options
+     * @param content
+     * @param opts
+     * @returns {string}
+     */
+    function createTH(content, opts) {
+        opts = opts || {};
+        var res = '<th';
+        if (opts.right) {
+            res += ' align="right"';
+        }
+        if (opts.title) {
+            res += ' title="' + opts.title + '"';
+        }
+        if (opts.id) {
+            res += ' id="' + opts.id + '"';
+        }
+        res += ' class="th">';
+        res += content;
+        res += '</th>';
+        return res;
+    }
+
+    /**
+     * Create a `td` element with content and options
+     * @param content
+     * @param opts
+     * @returns {string}
+     */
+    function createTD(content, opts) {
+        opts = opts || {};
+        var res = '<td';
+        if (opts.right) {
+            res += ' align="right"';
+        }
+        if (opts.title) {
+            res += ' title="' + opts.title + '"';
+        }
+        res += ' class="td">';
+        res += content;
+        res += '</td>';
+        return res;
+    }
+
+    /**
      * Returns true if obj is instance of Array
      * @param obj
      * @returns {boolean}
@@ -131,7 +190,7 @@ var wrt = {
     /**
      * Parses the values and returns a data array, where each element in the data array is an array with two elements,
      * and a totals array, that holds aggregated values for each column.
-     * The first element of each row in the data array, is the HTML output of the row as a `<tr>` element
+     * The first element of each row in the data array, is the HTML output of the row as a `tr` element
      * and the second is the actual data:
      *  [ result, data ]
      * @param values The `values` array
@@ -155,7 +214,7 @@ var wrt = {
 
     /**
      * Parse each row in the `values` array and return an array with two elements.
-     * The first element is the HTML output of the row as a `<tr>` element and the second is the actual data
+     * The first element is the HTML output of the row as a `tr` element and the second is the actual data
      *    [ result, data ]
      * @param data A row from the `values` array
      * @returns {[ string, [] ]}
@@ -195,22 +254,22 @@ var wrt = {
 
         // create displayData
         var displayData = [
-            '<td title="' + data[1] + '">' + data[0] + '<br />' + data[2] + '</td>',
-            '<td align="right">' + getSize(dlSpeed) + '/s</td>',
-            '<td align="right">' + getSize(upSpeed) + '/s</td>',
-            '<td align="right">' + getSize(data[3]) + '</td>',
-            '<td align="right">' + getSize(data[4]) + '</td>',
-            '<td align="right">' + getSize(data[5]) + '</td>',
-            '<td>' + getDateString(data[6]) + '</td>',
-            '<td>' + getDateString(data[7]) + '</td>'
+            createTD(data[0] + '<br />' + data[2], {title: data[1]}),
+            createTD(getSize(dlSpeed) + '/s', {right: true}),
+            createTD(getSize(upSpeed) + '/s', {right: true}),
+            createTD(getSize(data[3]), {right: true}),
+            createTD(getSize(data[4]), {right: true}),
+            createTD(getSize(data[5]), {right: true}),
+            createTD(getDateString(data[6])),
+            createTD(getDateString(data[7]))
         ];
 
         // display row data
-        var result = '<tr>';
+        var result = '';
         for (var k = 0; k < displayData.length; k++) {
             result += displayData[k];
         }
-        result += '</tr>';
+        result = createTR(result);
         return [result, rowData];
     }
 
@@ -221,25 +280,25 @@ var wrt = {
      * @returns {string} HTML output
      */
     function getDisplayData(data, totals) {
-        var result = '<tr>\
-                            <th id="thClient">Client</th>\
-                            <th id="thDownload">Download</th>\
-                            <th id="thUpload">Upload</th>\
-                            <th id="thTotalDown">Total Down</th>\
-                            <th id="thTotalUp">Total Up</th>\
-                            <th id="thTotal">Total</th>\
-                            <th id="thFirstSeen">First Seen</th>\
-                            <th id="thLastSeen">Last Seen</th>\
-                          </tr>';
+        var result =
+            createTH('Client', {id: 'thClient'}) +
+            createTH('Download', {id: 'thDownload'}) +
+            createTH('Upload', {id: 'thUpload'}) +
+            createTH('Total Down', {id: 'thTotalDown'}) +
+            createTH('Total Up', {id: 'thTotalUp'}) +
+            createTH('Total', {id: 'thTotal'}) +
+            createTH('First Seen', {id: 'thFirstSeen'}) +
+            createTH('Last Seen', {id: 'thLastSeen'});
+        result = createTR(result);
         for (var k = 0; k < data.length; k++) {
             result += data[k][0];
         }
-        result += '<tr><th>TOTAL</th>';
+        var totalsRow = createTH('TOTAL');
         for (var m = 0; m < totals.length; m++) {
             var t = totals[m];
-            result += '<td align="right">' + getSize(t) + (m < 2 ? '/s' : '') + '</td>'
+            totalsRow += createTD(getSize(t) + (m < 2 ? '/s' : ''), {right: true});
         }
-        result += '</tr>';
+        result += createTR(totalsRow);
         return result;
     }
 
@@ -270,12 +329,12 @@ var wrt = {
                         hostTotals[j] += data[i][1][j];
                     }
                 }
-                var hostTotalRow = '<tr><th title="' + data[curHost][1][1] + '">' + data[curHost][1][0] + '<br/> (host total) </th>';
+                var hostTotalRow = createTH(data[curHost][1][0] + '<br/> (host total)', {title: data[curHost][1][1]});
                 for (var m = 3; m < hostTotals.length; m++) {
                     var t = hostTotals[m];
-                    hostTotalRow += '<td align="right">' + getSize(t) + (m < 5 ? '/s' : '') + '</td>'
+                    hostTotalRow += createTD(getSize(t) + (m < 5 ? '/s' : ''), {right: true});
                 }
-                hostTotalRow += '</tr>';
+                hostTotalRow = createTR(hostTotalRow);
                 data.splice(insertAt, 0, [hostTotalRow, hostTotals]);
             }
             curHost = insertAt;

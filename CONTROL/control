@@ -1,5 +1,5 @@
 Package: luci-wrtbwmon
-Version: 0.8.1
+Version: 0.8.2
 Depends: luci, wrtbwmon
 Architecture: all
 Maintainer: Georgios Tzourmpakis <kiougar@gmail.com>

@@ -21,7 +21,8 @@ end
 
 function check_dependency()
     local ret = "0"
-    if require("luci.model.ipkg").installed('wrtbwmon') then
+    local status, ipkg = pcall(require, "luci.model.ipkg")
+    if not status or ipkg.installed('wrtbwmon') then
         ret = "1"
     end
     luci.http.prepare_content("text/plain")

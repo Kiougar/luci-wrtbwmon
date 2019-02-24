@@ -1,0 +1,95 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: LuCI: wrtbwmon\n"
+"POT-Creation-Date: 2019-02-19 21:00+0300\n"
+"PO-Revision-Date: 2019-02-23 00:09+0300\n"
+"Last-Translator: Marshak Igor aka !Joy! <videomiv@ukr.net>\n"
+"Language-Team: !Joy!\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"Project-Info: Перевод на русский утилиты wrtbwmon"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:13
+msgid "Auto update every"
+msgstr "Обновление каждые"
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:35
+msgid "Calculate per host totals"
+msgstr "Суммировать данные одного и того же MAC-адреса."
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:39
+msgid "Show per host aggregates only"
+msgstr "Отображать только агрегированные данные"
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:7
+msgid "Last updated"
+msgstr "Последнее обновление "
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:8
+msgid "Updating again in"
+msgstr "Следующее обновление через "
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:8
+msgid "seconds."
+msgstr "сек."
+
+#: applications/luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:6
+msgid ""
+"Check this to persist the database file under /etc/config. This ensures "
+"usage is persisted even across firmware updates."
+msgstr ""
+"Установите чекбокс, чтобы сохранить файл базы данных в /etc/config. Это "
+"гарантирует, что статистика сохранится даже при обновлении прошивки."
+
+#: applications/luci-wrtbwmon/luasrc/controller/wrtbwmon.lua:5
+msgid "Details"
+msgstr "Обзор"
+
+#: applications/luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:3
+msgid "General settings"
+msgstr "Основные настройки"
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:45
+msgid "Loading..."
+msgstr "Загрузка данных..."
+
+#: applications/luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:5
+msgid "Persist database"
+msgstr "Постоянная база данных"
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:4
+msgid "Reset Database"
+msgstr "Очистить Базу Данных"
+
+#: applications/luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/custom.lua:7
+msgid ""
+"This file is used to match users with MAC addresses.Each line must have the "
+"following format: \"00:aa:bb:cc:ee:ff,username\"."
+msgstr ""
+"Этот файл используется для сопоставления пользователей с MAC-адресами. "
+"Каждая строка списка, должна быть в таком формате: \"00:aa:bb:cc:ee:ff,"
+"username\"."
+
+#: applications/luci-wrtbwmon/luasrc/controller/wrtbwmon.lua:4
+msgid "Usage"
+msgstr "Статистика клиентов"
+
+#: applications/luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:1
+msgid "Usage - Configuration"
+msgstr "Статистика клиентов - Настройки"
+
+#: applications/luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/custom.lua:6
+msgid "Usage - Custom User File"
+msgstr "Статистика клиентов - Файл пользователей"
+
+#: applications/luci-wrtbwmon/luasrc/view/wrtbwmon.htm:2
+msgid "Usage - Details"
+msgstr "Статистика клиентов - Обзор"
+
+#: applications/luci-wrtbwmon/luasrc/controller/wrtbwmon.lua:7
+msgid "User file"
+msgstr "Файл пользователей"

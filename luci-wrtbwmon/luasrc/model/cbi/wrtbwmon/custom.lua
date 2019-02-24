@@ -2,10 +2,10 @@ local USER_FILE_PATH = "/etc/wrtbwmon.user"
 
 local fs = require "nixio.fs"
 
-local f = SimpleForm("wrtbwmon", 
-    "Usage - Custom User File", 
-    "This file is used to match users with MAC addresses."
-    .. "Each line must have the following format: \"00:aa:bb:cc:ee:ff,username\".")
+local f = SimpleForm("wrtbwmon",
+    translate("Usage - Custom User File"),
+    translate("This file is used to match users with MAC addresses."
+    .. "Each line must have the following format: \"00:aa:bb:cc:ee:ff,username\"."))
 
 local o = f:field(Value, "_custom")
 

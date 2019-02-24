@@ -1,0 +1,78 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:13
+msgid "Auto update every"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:35
+msgid "Calculate per host totals"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:39
+msgid "Show per host aggregates only"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:7
+msgid "Last updated"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:8
+msgid "Updating again in"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:8
+msgid "seconds."
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:6
+msgid ""
+"Check this to persist the database file under /etc/config. This ensures "
+"usage is persisted even across firmware updates."
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/controller/wrtbwmon.lua:5
+msgid "Details"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:3
+msgid "General settings"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:45
+msgid "Loading..."
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:5
+msgid "Persist database"
+msgstr "Постоянная база данных"
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:4
+msgid "Reset Database"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/custom.lua:7
+msgid ""
+"This file is used to match users with MAC addresses.Each line must have the "
+"following format: \"00:aa:bb:cc:ee:ff,username\"."
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/controller/wrtbwmon.lua:4
+msgid "Usage"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/config.lua:1
+msgid "Usage - Configuration"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/model/cbi/wrtbwmon/custom.lua:6
+msgid "Usage - Custom User File"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/view/wrtbwmon.htm:2
+msgid "Usage - Details"
+msgstr ""
+
+#: luci-wrtbwmon/luasrc/controller/wrtbwmon.lua:7
+msgid "User file"
+msgstr ""

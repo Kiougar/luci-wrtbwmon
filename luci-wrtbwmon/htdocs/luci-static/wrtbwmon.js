@@ -180,7 +180,7 @@ var wrt = {
         // set sorting arrows
         var el = document.getElementById(wrt.sortData.elId);
         if (el) {
-            el.innerHTML = el.innerHTML + (wrt.sortData.dir === 'desc' ? '&#x25BC' : '&#x25B2');
+            el.innerHTML = el.innerHTML + (wrt.sortData.dir === 'desc' ? '&#x25BC;' : '&#x25B2;');
         }
 
         // register table events

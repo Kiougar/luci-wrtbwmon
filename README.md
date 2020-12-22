@@ -59,8 +59,8 @@ There is no need for `wrtbwmon` to regurarly update the db since we only need to
 
 * Download the latest `.ipk` file from [releases](https://github.com/Kiougar/luci-wrtbwmon/releases)
 * Copy the file to your router `/tmp` directory
-    * I use the following command: `scp luci_wrtbwmon_*_all.ipk root@192.168.1.1:/tmp/`
-* Install the package `opkg install /tmp/luci_wrtbwmon_*_all.ipk`
+    * I use the following command: `scp luci-wrtbwmon_*_all.ipk root@192.168.1.1:/tmp/`
+* Install the package `opkg install /tmp/luci-wrtbwmon_*_all.ipk`
 * Clear the cache for `luci` to get the web interface to refresh `rm /tmp/luci-indexcache`
 
 ## TODO

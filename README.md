@@ -63,6 +63,8 @@ There is no need for `wrtbwmon` to regurarly update the db since we only need to
 * Install the package `opkg install /tmp/luci-wrtbwmon_*_all.ipk`
 * Clear the cache for `luci` to get the web interface to refresh `rm /tmp/luci-indexcache`
 
+Note that the `luci-compat` package is required, which you can install with: `opkg update && opkg install luci-compat`.
+
 ## TODO
 
 * Add the `.ipk` package to the `OpenWRT` feed

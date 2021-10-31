@@ -1,13 +1,16 @@
 <%+header%>
-<h2>Usage - Details</h2>
+<h2><%:Usage - Details%></h2>
 <p style="position:relative;">
-    <button id="resetDatabase" class="cbi-button" style="position:absolute;right:0;bottom:0;">Reset Database</button>
+    <button id="resetDatabase" class="cbi-button cbi-button-remove" style="position:absolute;right:0;bottom:0;height:28px;"><%:Reset Database%></button>
 </p>
 <p>
-    <small><span id="updated"></span> <span id="updating"></span></small>
+    <small style="display: none"><%:Last updated %>
+           <span id="updated"></span>
+           <span id="updating"> <%:Updating again in %><b id="updating-time"></b> <%:seconds.%></span>
+    </small>
     <span style="float:right;text-align:right;">
         <label>
-            <small>Auto update every</small>
+            <small><%:Auto update every%></small>
             <select id="intervalSelect" style="width:90px;height:20px;font-size:11px;">
                 <option value="-1">Disabled</option>
                 <option value="1">1 second</option>
@@ -29,17 +32,17 @@
         </label>
         <br/>
         <label>
-            <small>Calculate per host totals</small>
+            <small><%:Calculate per host totals%></small>
             <input id="perHostTotals" type="checkbox" style="vertical-align:middle;"/>
         </label>
         <!-- label>
-            <small>Show per host aggregates only</small>
+            <small><%:Show per host aggregates only%></small>
             <input id="showPerHostTotalsOnly" type="checkbox"/>
         </label -->
     </span>
 </p>
 <table class="table">
-    <tbody id="tableBody"><tr><td>Loading...</td></tr></tbody>
+    <tbody id="tableBody"><tr><td><%:Loading...%></td></tr></tbody>
 </table>
 <!--suppress HtmlUnknownTarget -->
 <script src="/luci-static/wrtbwmon.js"></script>

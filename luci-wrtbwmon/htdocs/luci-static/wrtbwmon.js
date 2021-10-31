@@ -414,6 +414,7 @@ var wrt = {
      */
     function receiveData(once) {
         var ajax = new XMLHttpRequest();
+        var upd_time_el = document.getElementById('updated');
         ajax.onreadystatechange = function () {
             // noinspection EqualityComparisonWithCoercionJS
             if (this.readyState == 4 && this.status == 200) {
@@ -434,7 +435,9 @@ var wrt = {
                         oldValues = v;
                         // set old date
                         oldDate = new Date();
-                        document.getElementById('updated').innerHTML = 'Last updated ' + dateToString(oldDate);
+
+                        upd_time_el.innerHTML = dateToString(oldDate)
+                        upd_time_el.parentElement.style.display = "inline";
                     }
                 }
                 var int = wrt.interval;
@@ -511,7 +514,8 @@ var wrt = {
      * @param msg
      */
     function setUpdateMessage(msg) {
-        document.getElementById('updating').innerHTML = msg;
+        document.getElementById('updating').style = (msg === '') ? 'none': 'inline';
+        document.getElementById('updating-time').innerHTML = msg;
     }
 
     /**
@@ -519,7 +523,7 @@ var wrt = {
      * @param start
      */
     function updateSeconds(start) {
-        setUpdateMessage('Updating again in <b>' + start + '</b> seconds.');
+        setUpdateMessage(+start);
         if (start > 0) {
             wrt.updateTimeout = window.setTimeout(function () {
                 updateSeconds(start - 1);
